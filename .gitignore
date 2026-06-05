@@ -1,0 +1,14 @@
+# Sesiones del companion visual de brainstorming
+.superpowers/
+
+# Capturas de referencia (pesadas, solo consulta local)
+*.PNG
+*.png
+*.jpg
+
+# Next.js / Node (para cuando exista la app)
+node_modules/
+.next/
+.env*
+!.env.example
+.vercel/
