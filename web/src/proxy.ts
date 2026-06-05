@@ -23,11 +23,9 @@ export async function proxy(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   const isLogin = request.nextUrl.pathname.startsWith("/login");
   const isCron = request.nextUrl.pathname.startsWith("/api/cron/");
-  const isRefresh = request.nextUrl.pathname.startsWith("/api/refresh");
   const allowed = user?.email === process.env.ALLOWED_EMAIL;
 
   if (isCron) return response; // el cron valida CRON_SECRET por su cuenta
-  if (isRefresh) return response; // refresh valida user por su cuenta
   if (!allowed && !isLogin)
     return NextResponse.redirect(new URL("/login", request.url));
   if (allowed && isLogin)
