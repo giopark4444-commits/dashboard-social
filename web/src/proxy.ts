@@ -22,7 +22,7 @@ export async function proxy(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
   const isLogin = request.nextUrl.pathname.startsWith("/login");
-  const isCron = request.nextUrl.pathname.startsWith("/api/cron");
+  const isCron = request.nextUrl.pathname.startsWith("/api/cron/");
   const allowed = user?.email === process.env.ALLOWED_EMAIL;
 
   if (isCron) return response; // el cron valida CRON_SECRET por su cuenta
