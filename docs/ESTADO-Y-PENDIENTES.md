@@ -1,7 +1,7 @@
 # 📍 Estado y Pendientes — Dashboard Social
 
-**Última actualización:** 2026-06-05 (cierre de sesión)
-**Rama activa:** `fase-1` (13+ commits) · **Repo:** https://github.com/giopark4444-commits/dashboard-social (privado)
+**Última actualización:** 2026-06-06 (sesión de documentación & testing completa)
+**Rama activa:** `main` (15 commits finales) · **Repo:** https://github.com/giopark4444-commits/dashboard-social (privado)
 
 ---
 
@@ -29,9 +29,9 @@
 
 ---
 
-## ⏸️ QUÉ NOS SALTAMOS (pospuesto por decisión de Gio)
+## ⏸️ PRÓXIMA SESIÓN: CREDENCIALES PENDIENTES (35 min)
 
-**Los 3 trámites de credenciales** (~15 min, requieren TUS cuentas — yo no puedo hacerlos):
+**Los 3 trámites de credenciales + usuario Supabase + testing** (~35 min total, requieren TUS cuentas — yo no puedo hacerlos):
 
 1. **Supabase** → https://supabase.com/dashboard/project/dhjkrrokvovlxmiuihxm/auth/users
    - a) Authentication → Users → **Add user**: email `gio.park.4444@gmail.com` + contraseña (marcar "Auto Confirm User"). *Sin esto no puedes hacer login en tu propia app.*
@@ -76,7 +76,9 @@ En cualquier sesión de Claude Code, di:
 
 > **"sigamos con el dashboard social"**
 
-Claude tiene el estado guardado en su memoria persistente y este archivo como respaldo. El siguiente paso exacto es el **trámite 1a (crear tu usuario en Supabase)**.
+Claude tiene el estado guardado en su memoria persistente. El siguiente paso exacto está documentado en:
+
+**👉 [PROXIMA-SESION.md](PROXIMA-SESION.md)** — Checklist completo paso a paso (35 min para terminar)
 
 ## 🗺️ Mapa de documentos
 
