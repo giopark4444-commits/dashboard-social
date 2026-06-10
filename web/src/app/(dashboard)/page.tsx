@@ -16,14 +16,18 @@ export default async function InicioPage() {
   const rows = (data ?? []) as SnapshotRow[];
   const youtube = computeDeltas(rows.filter((r) => r.platform === "youtube"));
 
-  const fecha = new Date().toLocaleDateString("es-CO",
-    { weekday: "long", day: "numeric", month: "long" });
+  const now = new Date();
+  const TZ = "America/Bogota";
+  const fecha = now.toLocaleDateString("es-CO",
+    { weekday: "long", day: "numeric", month: "long", timeZone: TZ });
+  const hora = Number(now.toLocaleString("en-US", { hour: "2-digit", hour12: false, timeZone: TZ }));
+  const saludo = hora < 12 ? "Buenos días" : hora < 19 ? "Buenas tardes" : "Buenas noches";
 
   return (
     <div className="max-w-5xl">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="text-2xl font-bold">Buenos días Gio 👋</h1>
+          <h1 className="text-2xl font-bold">{saludo} Gio 👋</h1>
           <p className="text-sm text-stone-400">{fecha}</p>
         </div>
         <RefreshButton />

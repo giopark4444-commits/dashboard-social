@@ -7,9 +7,12 @@ export default function RefreshButton() {
   const [busy, setBusy] = useState(false);
   async function refresh() {
     setBusy(true);
-    await fetch("/api/refresh", { method: "POST" });
-    router.refresh();
-    setBusy(false);
+    try {
+      await fetch("/api/refresh", { method: "POST" });
+      router.refresh();
+    } finally {
+      setBusy(false);
+    }
   }
   return (
     <button onClick={refresh} disabled={busy}
