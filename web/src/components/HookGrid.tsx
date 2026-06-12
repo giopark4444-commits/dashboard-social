@@ -28,7 +28,7 @@ export default function HookGrid() {
             <div className="flex items-start gap-3">
               <div className="text-2xl font-extrabold text-accent w-12 shrink-0">{h.score}</div>
               <div className="flex-1">
-                <p className="text-sm text-bright leading-snug">"{h.text}"</p>
+                <p className="text-sm text-bright leading-snug">“{h.text}”</p>
                 <div className="flex gap-2 mt-2 items-center">
                   {h.tags.map((t) => (
                     <span key={t} className="text-[9px] border border-border text-dim rounded px-1.5 py-0.5">#{t}</span>

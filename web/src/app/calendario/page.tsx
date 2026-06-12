@@ -9,7 +9,6 @@ const ESTADO_STYLE: Record<string, string> = {
 };
 
 export default function CalendarioPage() {
-  // eslint-disable-next-line react-hooks/purity
   const now = new Date();
   const year = now.getFullYear(), month = now.getMonth();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
