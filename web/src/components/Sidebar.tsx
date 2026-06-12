@@ -2,61 +2,72 @@
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { NAV_ITEMS } from "@/lib/nav";
+import { NAV_ITEMS, NAV_GROUPS } from "@/lib/nav";
+import BrandSwitcher from "@/components/BrandSwitcher";
+import type { Brand } from "@/lib/brands";
 
-export default function Sidebar({ updatedAt }: { updatedAt: string | null }) {
+export default function Sidebar({ updatedAt, brand }:
+  { updatedAt: string | null; brand: Brand }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
-  const groups = [1, 2, 3] as const;
 
   return (
     <aside
-      className={`${collapsed ? "w-16" : "w-56"} shrink-0 overflow-hidden bg-stone-100 border-r border-stone-200 ${collapsed ? "px-2 py-4" : "p-4"} flex flex-col min-h-screen transition-[width] duration-200`}
+      className={`${collapsed ? "w-16" : "w-60"} shrink-0 overflow-hidden bg-surface border-r border-border ${collapsed ? "px-2 py-4" : "p-4"} flex flex-col min-h-screen transition-[width] duration-200`}
     >
       <button
         onClick={() => setCollapsed(!collapsed)}
         title={collapsed ? "Expandir menú" : "Encoger menú"}
-        className={`mb-3 rounded-lg py-1 text-stone-400 hover:bg-stone-200 hover:text-stone-600 text-sm ${collapsed ? "w-full text-center" : "self-end px-2"}`}
+        className={`mb-3 rounded-lg py-1 text-dim hover:bg-surface-2 hover:text-muted text-sm ${collapsed ? "w-full text-center" : "self-end px-2"}`}
       >
         {collapsed ? "»" : "«"}
       </button>
 
-      <div className="text-center mb-4">
-        <div className={`${collapsed ? "w-8 h-8" : "w-12 h-12"} rounded-full bg-stone-300 mx-auto ${collapsed ? "" : "mb-2"}`} />
-        {!collapsed && (
-          <>
-            <div className="font-bold text-stone-800">Gio</div>
-            <div className="text-xs text-stone-400">
-              {updatedAt ? `Actualizado ${updatedAt}` : "Sin datos aún"}
-            </div>
-            <div className="inline-block bg-yellow-100 text-yellow-800 text-xs rounded-full px-2 py-0.5 mt-1">
-              ★ Score —/100
-            </div>
-          </>
-        )}
+      {!collapsed && (
+        <div className="mb-3">
+          <div className="font-bold text-bright tracking-widest text-sm">▣ VANTAGE STUDIO</div>
+          <div className="text-[10px] text-dim tracking-widest">
+            {updatedAt ? `ACTUALIZADO ${updatedAt}` : "SIN DATOS AÚN"}
+          </div>
+        </div>
+      )}
+
+      <div className="mb-4">
+        <BrandSwitcher active={brand} collapsed={collapsed} />
       </div>
 
       <nav className="flex-1 flex flex-col text-sm">
-        {groups.map((g) => (
-          <div key={g} className={g > 1 ? "border-t border-dashed border-stone-300 mt-2 pt-2" : ""}
-            style={g === 3 ? { marginTop: "auto" } : undefined}>
-            {NAV_ITEMS.filter((i) => i.group === g).map((item) => {
-              const href = `/${item.slug}`;
-              const active = pathname === href;
-              return (
-                <Link key={item.slug} href={href} title={item.label}
-                  className={`flex items-center rounded-lg py-1.5 mb-0.5 ${
-                    collapsed ? "justify-center px-0" : "gap-2 px-3"
-                  } ${
-                    active ? "bg-white font-semibold text-stone-900 shadow-sm"
-                           : "text-stone-500 hover:bg-stone-200"}`}>
-                  <span className="text-base leading-none shrink-0">{item.emoji}</span>
-                  {!collapsed && <span className="truncate">{item.label}</span>}
-                </Link>
-              );
-            })}
-          </div>
-        ))}
+        {NAV_GROUPS.map((g) => {
+          const items = NAV_ITEMS.filter((i) => i.group === g.id);
+          if (items.length === 0) return null;
+          return (
+            <div key={g.id} style={g.id === "sistema" ? { marginTop: "auto" } : undefined}>
+              {!collapsed && g.label && (
+                <div className="text-[9px] tracking-[0.2em] text-dim uppercase mt-3 mb-1 px-3">
+                  {g.label}
+                </div>
+              )}
+              {items.map((item) => {
+                const href = `/${item.slug}`;
+                const active = pathname === href;
+                return (
+                  <Link key={item.slug} href={href} title={item.label}
+                    className={`flex items-center rounded-lg py-1.5 mb-0.5 ${
+                      collapsed ? "justify-center px-0" : "gap-2 px-3"
+                    } ${
+                      active ? "bg-surface-2 font-semibold text-bright"
+                             : "text-muted hover:bg-surface-2"}`}>
+                    <span className="text-base leading-none shrink-0 text-accent">{item.icon}</span>
+                    {!collapsed && <span className="truncate">{item.label}</span>}
+                    {!collapsed && item.phase && (
+                      <span className="ml-auto text-[9px] text-dim">F{item.phase}</span>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          );
+        })}
       </nav>
     </aside>
   );

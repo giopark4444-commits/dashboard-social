@@ -55,13 +55,14 @@ export async function runSnapshot(): Promise<{ ok: string[]; failed: string[] }>
       const stats = await job.fetch();
       const { error } = await supabase.from("snapshots").upsert(
         {
+          brand_id: "personal",
           platform: stats.platform,
           snapshot_date: today,
           followers: stats.followers,
           total_views: stats.totalViews,
           posts_count: stats.postsCount,
         },
-        { onConflict: "platform,snapshot_date" }
+        { onConflict: "brand_id,platform,snapshot_date" }
       );
       if (error) throw new Error(error.message);
       ok.push(job.platform);

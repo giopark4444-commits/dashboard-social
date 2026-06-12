@@ -1,22 +1,38 @@
-export type NavItem = { slug: string; label: string; emoji: string; group: 1 | 2 | 3 };
+export type NavGroupId = "centro" | "canales" | "crecimiento" | "contenido" | "inteligencia" | "sistema";
+export type NavGroupDef = { id: NavGroupId; label: string };
 
-// group 1 = analítica/contenido · 2 = mensajería · 3 = inferior
+export const NAV_GROUPS: NavGroupDef[] = [
+  { id: "centro",       label: "Centro" },
+  { id: "canales",      label: "Canales" },
+  { id: "crecimiento",  label: "Crecimiento" },
+  { id: "contenido",    label: "Contenido" },
+  { id: "inteligencia", label: "Inteligencia" },
+  { id: "sistema",      label: "" }, // grupo inferior sin título
+];
+
+// phase = fase del spec en la que el módulo cobra vida; sin phase ⇒ vive desde la Fase 1
+export type NavItem = { slug: string; label: string; icon: string; group: NavGroupId; phase?: number };
+
 export const NAV_ITEMS: NavItem[] = [
-  { slug: "", label: "Inicio", emoji: "🏠", group: 1 },
-  { slug: "posts", label: "Posts", emoji: "🗂", group: 1 },
-  { slug: "constancia", label: "Constancia", emoji: "📈", group: 1 },
-  { slug: "ideas", label: "Ideas IA", emoji: "💡", group: 1 },
-  { slug: "asistente", label: "Asistente", emoji: "💬", group: 1 },
-  { slug: "audiencia", label: "Mi audiencia", emoji: "🧠", group: 1 },
-  { slug: "voz", label: "Mi voz", emoji: "🎙", group: 1 },
-  { slug: "proximos", label: "Próximos", emoji: "🎬", group: 1 },
-  { slug: "calendario", label: "Calendario", emoji: "📅", group: 1 },
-  { slug: "tendencias", label: "Tendencias", emoji: "📊", group: 1 },
-  { slug: "referentes", label: "Referentes", emoji: "👥", group: 1 },
-  { slug: "campanas", label: "Campañas", emoji: "🤝", group: 1 },
-  { slug: "telegram", label: "Telegram", emoji: "✈️", group: 2 },
-  { slug: "discord", label: "Discord", emoji: "🎮", group: 2 },
-  { slug: "ajustes", label: "Ajustes", emoji: "⚙️", group: 3 },
+  { slug: "",            label: "Dashboard",        icon: "◈", group: "centro" },
+  { slug: "brief",       label: "Daily Brief",      icon: "☀", group: "centro",       phase: 2 },
+  { slug: "inbox",       label: "Inbox",            icon: "✉", group: "centro",       phase: 6 },
+  { slug: "youtube",     label: "YouTube",          icon: "▶", group: "canales",      phase: 2 },
+  { slug: "instagram",   label: "Instagram",        icon: "◎", group: "canales",      phase: 7 },
+  { slug: "meta-ads",    label: "Meta Ads",         icon: "▣", group: "canales",      phase: 7 },
+  { slug: "whatsapp",    label: "Bot WhatsApp",     icon: "✆", group: "canales",      phase: 5 },
+  { slug: "prospeccion", label: "Prospección",      icon: "⌖", group: "crecimiento",  phase: 6 },
+  { slug: "ventas",      label: "Ventas",           icon: "↗", group: "crecimiento",  phase: 6 },
+  { slug: "calendario",  label: "Content Calendar", icon: "▦", group: "contenido",    phase: 4 },
+  { slug: "carrusel",    label: "Carrusel Studio",  icon: "❏", group: "contenido",    phase: 4 },
+  { slug: "hooks",       label: "Hook Bank",        icon: "⚓", group: "contenido",    phase: 4 },
+  { slug: "trends",      label: "Trend Scout",      icon: "≈", group: "contenido",    phase: 5 },
+  { slug: "video",       label: "Video Analysis",   icon: "◬", group: "contenido",    phase: 4 },
+  { slug: "audits",      label: "Audit Inbox",      icon: "✓", group: "inteligencia", phase: 7 },
+  { slug: "skills",      label: "Skills Library",   icon: "✦", group: "inteligencia", phase: 2 },
+  { slug: "agentes",     label: "Agentes",          icon: "⌬", group: "inteligencia" },
+  { slug: "jarvis",      label: "Jarvis HUD",       icon: "◉", group: "inteligencia", phase: 3 },
+  { slug: "ajustes",     label: "Ajustes",          icon: "⚙", group: "sistema",      phase: 2 },
 ];
 
 export const SECTION_SLUGS = NAV_ITEMS.map((i) => i.slug).filter(Boolean);
