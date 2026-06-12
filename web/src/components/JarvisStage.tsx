@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import JarvisOrb from "@/components/JarvisOrb";
 
 type Line = { who: "tú" | "jarvis"; text: string };
@@ -36,7 +36,12 @@ export default function JarvisStage({ left, right }: { left: ReactNode; right: R
   const [input, setInput] = useState("");
   const [listening, setListening] = useState(false);
   const [speaking, setSpeaking] = useState(false);
-  const [micSupported] = useState(() => getSpeechRecCtor() !== null);
+  // useSyncExternalStore: false en SSR, valor real tras hidratar — sin mismatch
+  const micSupported = useSyncExternalStore(
+    () => () => {},
+    () => getSpeechRecCtor() !== null,
+    () => false
+  );
   const replyIdx = useRef(0);
   const recRef = useRef<SpeechRec | null>(null);
   const audioRef = useRef<{ ctx: AudioContext; stream: MediaStream; raf: number } | null>(null);
