@@ -13,3 +13,6 @@ node_modules/
 !.env.example
 .vercel/
 .DS_Store
+
+# iconos de la PWA sí van al repo
+!web/public/*.png
