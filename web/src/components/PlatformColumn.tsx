@@ -10,7 +10,7 @@ export function PlatformColumn({ name, icon, unit, deltas }:
   { name: string; icon: string; unit: string; deltas: Deltas }) {
   const d = deltas.vsYesterday;
   return (
-    <div className="flex-1 bg-surface border border-border rounded-xl p-4">
+    <div className="flex-1 bg-surface border border-border rounded-xl p-4 transition-colors hover:border-accent/40">
       <div className="font-bold text-bright border-b border-border pb-2 mb-2">
         <span className="text-accent">{icon}</span> {name}
       </div>
@@ -36,7 +36,7 @@ export function PlatformColumn({ name, icon, unit, deltas }:
 export function DemoColumn({ name, icon, note }:
   { name: string; icon: string; note: string }) {
   return (
-    <div className="flex-1 bg-surface/50 border border-dashed border-border rounded-xl p-4">
+    <div className="flex-1 bg-surface/50 border border-dashed border-border rounded-xl p-4 transition-colors hover:border-warn/40">
       <div className="font-bold text-muted border-b border-border pb-2 mb-2 flex items-center gap-2">
         <span>{icon} {name}</span>
         <span className="ml-auto text-[9px] border border-warn/50 text-warn rounded px-1.5 py-0.5">DEMO</span>

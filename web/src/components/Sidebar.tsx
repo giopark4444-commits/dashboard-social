@@ -52,11 +52,12 @@ export default function Sidebar({ updatedAt, brand }:
                 const active = pathname === href;
                 return (
                   <Link key={item.slug} href={href} title={item.label}
-                    className={`flex items-center rounded-lg py-1.5 mb-0.5 ${
+                    className={`relative flex items-center rounded-lg py-1.5 mb-0.5 ${
                       collapsed ? "justify-center px-0" : "gap-2 px-3"
                     } ${
                       active ? "bg-surface-2 font-semibold text-bright"
                              : "text-muted hover:bg-surface-2"}`}>
+                    {active && <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 bg-accent rounded-full" />}
                     <span className="text-base leading-none shrink-0 text-accent">{item.icon}</span>
                     {!collapsed && <span className="truncate">{item.label}</span>}
                     {!collapsed && item.phase && (
