@@ -52,7 +52,7 @@ export default async function DashboardPage() {
       </Link>
 
       <p className="text-[10px] tracking-widest text-dim mb-2">✦ CANALES</p>
-      <div className="flex gap-3 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         <PlatformColumn name="YouTube" icon="▶" unit="suscriptores" deltas={youtube} />
         <DemoColumn name="Instagram" icon="◎" note="se conecta en Fase 7 (trámites Meta)" />
         <DemoColumn name="Meta Ads" icon="▣" note="se conecta en Fase 7 (trámites Meta)" />
@@ -60,7 +60,7 @@ export default async function DashboardPage() {
       </div>
 
       <p className="text-[10px] tracking-widest text-dim mb-2">✦ AGENTES</p>
-      <div className="flex gap-3">
+      <div className="flex flex-col md:flex-row gap-3">
         <Link href="/agentes"
           className="flex-1 bg-surface border border-border rounded-xl p-4 hover:border-accent/50">
           <div className="text-2xl font-extrabold text-bright">{autoAgents ?? 0}</div>
