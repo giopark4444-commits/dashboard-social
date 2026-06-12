@@ -1,8 +1,8 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 
-/** Orbe animado del HUD: núcleo pulsante + anillos de onda + partículas en órbita. Canvas 2D puro. */
-export default function JarvisOrb({ size = 280 }: { size?: number }) {
+/** Orbe del HUD. `levelRef` (0-1) modula amplitud/brillo en vivo sin re-renders (mic o voz). */
+export default function JarvisOrb({ size = 280, levelRef }: { size?: number; levelRef?: RefObject<number> }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -19,32 +19,34 @@ export default function JarvisOrb({ size = 280 }: { size?: number }) {
 
     function draw(now: number) {
       const t = (now - start) / 1000;
+      const level = Math.max(0, Math.min(1, levelRef?.current ?? 0));
       ctx.clearRect(0, 0, size, size);
 
-      // halo
+      // halo (más brillante con nivel de audio)
       const halo = ctx.createRadialGradient(cx, cy, 0, cx, cy, size / 2);
-      halo.addColorStop(0, "rgba(79,140,255,0.25)");
+      halo.addColorStop(0, `rgba(79,140,255,${0.25 + level * 0.25})`);
       halo.addColorStop(0.6, "rgba(79,140,255,0.06)");
       halo.addColorStop(1, "rgba(79,140,255,0)");
       ctx.fillStyle = halo;
       ctx.fillRect(0, 0, size, size);
 
-      // anillos de onda (radio modulado por seno — simula audio-reactividad)
+      // anillos de onda (amplitud modulada por audio)
+      const amp = 1 + level * 2.5;
       for (let ring = 0; ring < 3; ring++) {
         ctx.beginPath();
         for (let a = 0; a <= Math.PI * 2 + 0.01; a += 0.05) {
-          const wob = Math.sin(a * (5 + ring * 2) + t * (1.2 + ring * 0.5)) * (4 + ring * 2);
+          const wob = Math.sin(a * (5 + ring * 2) + t * (1.2 + ring * 0.5)) * (4 + ring * 2) * amp;
           const r = size * 0.22 + ring * 14 + wob + Math.sin(t * 1.5) * 3;
           const x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r;
           if (a === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
         }
-        ctx.strokeStyle = `rgba(79,140,255,${0.45 - ring * 0.13})`;
+        ctx.strokeStyle = `rgba(79,140,255,${0.45 - ring * 0.13 + level * 0.2})`;
         ctx.lineWidth = 1.2;
         ctx.stroke();
       }
 
       // núcleo
-      const pulse = 1 + Math.sin(t * 2) * 0.06;
+      const pulse = 1 + Math.sin(t * 2) * 0.06 + level * 0.3;
       const core = ctx.createRadialGradient(cx, cy, 0, cx, cy, size * 0.16 * pulse);
       core.addColorStop(0, "rgba(232,240,255,0.95)");
       core.addColorStop(0.4, "rgba(79,140,255,0.8)");
@@ -67,7 +69,7 @@ export default function JarvisOrb({ size = 280 }: { size?: number }) {
     }
     raf = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(raf);
-  }, [size]);
+  }, [size, levelRef]);
 
   return <canvas ref={ref} style={{ width: size, height: size }} aria-hidden />;
 }

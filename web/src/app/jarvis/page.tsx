@@ -2,8 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getActiveBrand } from "@/lib/brands-server";
 import { computeDeltas, type SnapshotRow } from "@/lib/snapshots";
-import JarvisOrb from "@/components/JarvisOrb";
-import JarvisConsole from "@/components/JarvisConsole";
+import JarvisStage from "@/components/JarvisStage";
 
 export const dynamic = "force-dynamic";
 
@@ -33,7 +32,6 @@ export default async function JarvisPage() {
 
   return (
     <div className="fixed inset-0 z-40 bg-background flex flex-col items-center justify-center overflow-hidden">
-      {/* rejilla de fondo */}
       <div className="absolute inset-0 opacity-[0.07]"
         style={{ backgroundImage: "linear-gradient(#4f8cff 1px, transparent 1px), linear-gradient(90deg, #4f8cff 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
 
@@ -45,21 +43,20 @@ export default async function JarvisPage() {
       <p className="text-[10px] tracking-[0.4em] text-accent mb-2 z-10">✦ COMMAND CENTER · VANTAGE STUDIO</p>
       <h1 className="text-4xl font-extrabold text-bright tracking-[0.2em] mb-6 z-10">J.A.R.V.I.S.</h1>
 
-      <div className="flex items-center gap-10 z-10">
-        <div className="hidden md:flex flex-col gap-3">
-          <Readout label="Suscriptores YT" value={youtube.current?.toLocaleString("es-CO") ?? "—"} />
-          <Readout label="Vs ayer" value={youtube.vsYesterday != null ? `${youtube.vsYesterday >= 0 ? "+" : ""}${youtube.vsYesterday}` : "—"} />
-        </div>
-        <JarvisOrb size={300} />
-        <div className="hidden md:flex flex-col gap-3">
-          <Readout label="Agentes activos" value={String(autoAgents ?? 0)} />
-          <Readout label="Voz" value="FASE FINAL" />
-        </div>
-      </div>
-
-      <div className="mt-8 z-10 w-full flex justify-center px-6">
-        <JarvisConsole />
-      </div>
+      <JarvisStage
+        left={
+          <>
+            <Readout label="Suscriptores YT" value={youtube.current?.toLocaleString("es-CO") ?? "—"} />
+            <Readout label="Vs ayer" value={youtube.vsYesterday != null ? `${youtube.vsYesterday >= 0 ? "+" : ""}${youtube.vsYesterday}` : "—"} />
+          </>
+        }
+        right={
+          <>
+            <Readout label="Agentes activos" value={String(autoAgents ?? 0)} />
+            <Readout label="Voz" value="EN LÍNEA" />
+          </>
+        }
+      />
     </div>
   );
 }
