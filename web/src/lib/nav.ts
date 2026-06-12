@@ -19,6 +19,7 @@ export const NAV_ITEMS: NavItem[] = [
   { slug: "inbox",       label: "Inbox",            icon: "✉", group: "centro" },
   { slug: "youtube",     label: "YouTube",          icon: "▶", group: "canales",      phase: 2 },
   { slug: "instagram",   label: "Instagram",        icon: "◎", group: "canales",      phase: 7 },
+  { slug: "tiktok",      label: "TikTok",           icon: "♪", group: "canales",      phase: 7 },
   { slug: "meta-ads",    label: "Meta Ads",         icon: "▣", group: "canales",      phase: 7 },
   { slug: "whatsapp",    label: "Bot WhatsApp",     icon: "✆", group: "canales",      phase: 5 },
   { slug: "prospeccion", label: "Prospección",      icon: "⌖", group: "crecimiento" },

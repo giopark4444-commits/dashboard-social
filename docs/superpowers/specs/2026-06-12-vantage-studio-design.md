@@ -53,7 +53,7 @@ Tres piezas que se comunican a través de Supabase (cola de trabajos + realtime)
 - Diferidas a trámites Meta: Instagram Graph API, Meta Ads API
 - WhatsApp: librería no-oficial en el runner (independiente de Vendalo)
 
-## 4. Módulos (18, en 5 grupos)
+## 4. Módulos (19, en 5 grupos)
 
 ### Centro
 - **Dashboard** — command center por marca: KPIs de todos los canales, agentes activos, alertas, accesos rápidos.
@@ -63,6 +63,7 @@ Tres piezas que se comunican a través de Supabase (cola de trabajos + realtime)
 ### Canales
 - **YouTube** (ya anda) — métricas y snapshots heredados + análisis IA por video.
 - **Instagram** (Meta) — reels, posts, demografía, competencia. Carga manual primero, API después.
+- **TikTok** (API de TikTok) — videos, views, seguidores, tendencias del FYP. Demo primero; API en Fase 7 (agregado 2026-06-12 a pedido de Gio).
 - **Meta Ads** (Meta) — campañas, gasto, ROAS, creativos ganadores. Demo/manual primero.
 - **Bot WhatsApp** (runner) — bot propio con anti-baneo: conversaciones, embudos, respuestas IA por marca.
 
@@ -112,7 +113,7 @@ Cada fase termina desplegada y funcionando en producción.
 4. **Fábrica de contenido** — Hook Bank, Content Calendar, Carrusel Studio, Video Analysis, con agentes en modo Copiloto.
 5. **El músculo** — runner Node + cola `jobs`; primero Trend Scout, luego Bot WhatsApp con anti-baneo.
 6. **Crecimiento** — Prospección + Ventas + Inbox unificado (con lo disponible sin Meta).
-7. **Conexiones Meta** — Instagram Graph y Meta Ads pasan de demo a real; Audit Inbox con datos reales.
+7. **Conexiones externas** — Instagram Graph, TikTok API y Meta Ads pasan de demo a real; Audit Inbox con datos reales.
 
 ## 7. Manejo de errores y guardarraíles
 
