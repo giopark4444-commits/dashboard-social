@@ -25,6 +25,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Sidebar updatedAt={updatedAt} brand={brand} />
           <main className="flex-1 p-6">{children}</main>
         </div>
+        {process.env.DEMO_MODE === "1" && process.env.NODE_ENV === "development" && (
+          <div className="fixed bottom-3 left-1/2 -translate-x-1/2 z-50 text-[10px] tracking-widest bg-warn/15 border border-warn/50 text-warn rounded-full px-3 py-1 backdrop-blur">
+            ◉ MODO DEMO LOCAL — SIN SESIÓN
+          </div>
+        )}
       </body>
     </html>
   );
