@@ -15,24 +15,24 @@ export type NavItem = { slug: string; label: string; icon: string; group: NavGro
 
 export const NAV_ITEMS: NavItem[] = [
   { slug: "",            label: "Dashboard",        icon: "◈", group: "centro" },
-  { slug: "brief",       label: "Daily Brief",      icon: "☀", group: "centro",       phase: 2 },
-  { slug: "inbox",       label: "Inbox",            icon: "✉", group: "centro",       phase: 6 },
+  { slug: "brief",       label: "Daily Brief",      icon: "☀", group: "centro" },
+  { slug: "inbox",       label: "Inbox",            icon: "✉", group: "centro" },
   { slug: "youtube",     label: "YouTube",          icon: "▶", group: "canales",      phase: 2 },
   { slug: "instagram",   label: "Instagram",        icon: "◎", group: "canales",      phase: 7 },
   { slug: "meta-ads",    label: "Meta Ads",         icon: "▣", group: "canales",      phase: 7 },
   { slug: "whatsapp",    label: "Bot WhatsApp",     icon: "✆", group: "canales",      phase: 5 },
-  { slug: "prospeccion", label: "Prospección",      icon: "⌖", group: "crecimiento",  phase: 6 },
-  { slug: "ventas",      label: "Ventas",           icon: "↗", group: "crecimiento",  phase: 6 },
+  { slug: "prospeccion", label: "Prospección",      icon: "⌖", group: "crecimiento" },
+  { slug: "ventas",      label: "Ventas",           icon: "↗", group: "crecimiento" },
   { slug: "calendario",  label: "Content Calendar", icon: "▦", group: "contenido" },
   { slug: "carrusel",    label: "Carrusel Studio",  icon: "❏", group: "contenido" },
   { slug: "hooks",       label: "Hook Bank",        icon: "⚓", group: "contenido" },
   { slug: "trends",      label: "Trend Scout",      icon: "≈", group: "contenido" },
   { slug: "video",       label: "Video Analysis",   icon: "◬", group: "contenido" },
-  { slug: "audits",      label: "Audit Inbox",      icon: "✓", group: "inteligencia", phase: 7 },
+  { slug: "audits",      label: "Audit Inbox",      icon: "✓", group: "inteligencia" },
   { slug: "skills",      label: "Skills Library",   icon: "✦", group: "inteligencia", phase: 2 },
   { slug: "agentes",     label: "Agentes",          icon: "⌬", group: "inteligencia" },
   { slug: "jarvis",      label: "Jarvis HUD",       icon: "◉", group: "inteligencia" },
-  { slug: "ajustes",     label: "Ajustes",          icon: "⚙", group: "sistema",      phase: 2 },
+  { slug: "ajustes",     label: "Ajustes",          icon: "⚙", group: "sistema" },
 ];
 
 export const SECTION_SLUGS = NAV_ITEMS.map((i) => i.slug).filter(Boolean);
