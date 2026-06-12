@@ -1,11 +1,16 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
 import MobileTopbar from "@/components/MobileTopbar";
 import { createClient } from "@/lib/supabase/server";
 import { getActiveBrand } from "@/lib/brands-server";
 
-export const metadata: Metadata = { title: "Vantage Studio" };
+export const metadata: Metadata = {
+  title: "Vantage Studio",
+  appleWebApp: { capable: true, title: "Vantage", statusBarStyle: "black-translucent" },
+  icons: { apple: "/apple-touch-icon.png" },
+};
+export const viewport: Viewport = { themeColor: "#070b14" };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
