@@ -73,7 +73,7 @@ export default async function DashboardPage() {
           ) : (
             (runs ?? []).map((r) => (
               <div key={r.id} className="text-xs text-muted">
-                <span className={r.status === "ok" ? "text-ok" : "text-warn"}>●</span>{" "}
+                <span className={r.status === "ok" ? "text-ok" : r.status === "error" ? "text-red-400" : "text-warn"}>●</span>{" "}
                 {r.agent_id} · {r.action}
               </div>
             ))
