@@ -52,9 +52,10 @@ export default async function DashboardPage() {
       </Link>
 
       <p className="text-[10px] tracking-widest text-dim mb-2">✦ CANALES</p>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
         <PlatformColumn name="YouTube" icon="▶" unit="suscriptores" deltas={youtube} />
         <DemoColumn name="Instagram" icon="◎" note="se conecta en Fase 7 (trámites Meta)" />
+        <DemoColumn name="TikTok" icon="♪" note="se conecta en Fase 7 (API de TikTok)" />
         <DemoColumn name="Meta Ads" icon="▣" note="se conecta en Fase 7 (trámites Meta)" />
         <DemoColumn name="WhatsApp" icon="✆" note="llega en Fase 5 (runner)" />
       </div>

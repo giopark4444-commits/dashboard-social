@@ -45,6 +45,9 @@ export default function AjustesPage() {
         <Fila nombre="Instagram" nota="requiere app de Meta Developers">
           <Estado ok={false} okText="" pendText="FASE APIS" />
         </Fila>
+        <Fila nombre="TikTok" nota="requiere app en TikTok for Developers">
+          <Estado ok={false} okText="" pendText="FASE APIS" />
+        </Fila>
         <Fila nombre="Meta Ads" nota="requiere app de Meta Developers">
           <Estado ok={false} okText="" pendText="FASE APIS" />
         </Fila>
