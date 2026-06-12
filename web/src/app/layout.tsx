@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
 import { createClient } from "@/lib/supabase/server";
+import { getActiveBrand } from "@/lib/brands-server";
 
-export const metadata: Metadata = { title: "Dashboard Social" };
+export const metadata: Metadata = { title: "Vantage Studio" };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
+  const brand = await getActiveBrand();
   const { data } = await supabase
     .from("snapshots")
     .select("created_at")
@@ -18,9 +20,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="es">
-      <body className="bg-stone-50 text-stone-900">
+      <body className="bg-background text-foreground">
         <div className="flex">
-          <Sidebar updatedAt={updatedAt} />
+          <Sidebar updatedAt={updatedAt} brand={brand} />
           <main className="flex-1 p-6">{children}</main>
         </div>
       </body>
