@@ -16,3 +16,4 @@ node_modules/
 
 # iconos de la PWA sí van al repo
 !web/public/*.png
+!docs/img/*.png
