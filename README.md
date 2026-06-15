@@ -30,7 +30,9 @@ Una sola app para operar el marketing de **5 marcas** (workspaces): marca person
 
 ![Jarvis HUD](docs/img/jarvis.png)
 
-HUD fullscreen con orbe animado en canvas 2D (cero dependencias). **Escucha continua** con palabra de activación — dices *"Jarvis, dame el brief de hoy"* y responde **con voz**, en **español, inglés o francés** (Web Speech API del navegador, sin servicios de pago). El orbe vibra con el audio real de tu micrófono.
+HUD fullscreen con orbe animado (cero dependencias). **Escucha continua** con palabra de activación — dices *"Jarvis, dame el brief de hoy"* y responde **con voz**, en **español, inglés o francés** (Web Speech API del navegador, sin servicios de pago). El orbe vibra con el audio real de tu micrófono.
+
+> 🔭 **En rediseño:** el orbe está evolucionando a una **constelación líquida 3D** (partículas con colas de cometa + plexus, WebGL). Prototipo y notas en [`docs/jarvis-orb/`](docs/jarvis-orb/).
 
 ## Carrusel Studio
 

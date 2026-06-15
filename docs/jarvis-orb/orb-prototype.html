@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Vantage · Jarvis cometas líquidos</title>
+<style>
+  :root{ --bright:#e8f0ff; --muted:#8fa3c8; --accent:#6f9bff; }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; height:100%; overflow:hidden; color:var(--bright); font-family:ui-monospace,Menlo,Consolas,monospace; background:#04060d; }
+  canvas{ position:fixed; inset:0; width:100%; height:100%; display:block; }
+  .ui{ position:fixed; inset:0; pointer-events:none; display:flex; flex-direction:column; align-items:center; z-index:2; }
+  .top{ margin-top:5vh; text-align:center; }
+  .k{ font-size:11px; letter-spacing:.45em; color:var(--accent); }
+  h1{ margin:8px 0 0; font-size:clamp(28px,5vw,48px); letter-spacing:.22em; font-weight:800; }
+  .bottom{ position:absolute; bottom:6vh; width:100%; text-align:center; }
+  .state{ font-size:11px; letter-spacing:.25em; color:var(--muted); margin-bottom:14px; }
+  .state b{ color:var(--accent); }
+  .btn{ pointer-events:auto; background:rgba(111,155,255,.12); border:1px solid rgba(111,155,255,.5); color:var(--bright);
+    border-radius:10px; padding:10px 20px; font:inherit; font-size:13px; letter-spacing:.08em; cursor:pointer; }
+  .btn:hover{ background:rgba(111,155,255,.22); }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="ui">
+  <div class="top"><div class="k">✦ VANTAGE STUDIO · COMMAND CENTER</div><h1>J.A.R.V.I.S.</h1></div>
+  <div class="bottom">
+    <div class="state" id="state">○ EN REPOSO — fluyendo</div>
+    <button class="btn" id="talk">◉ simular que habla (contraer / expandir)</button>
+  </div>
+</div>
+<script>
+const canvas=document.getElementById("c");
+const gl=canvas.getContext("webgl",{antialias:true,alpha:false});
+const stateEl=document.getElementById("state");
+if(!gl) stateEl.textContent="WebGL no disponible";
+
+/* ---------- noise + curl ---------- */
+function sm(t){ return t*t*t*(t*(t*6-15)+10); }
+function h(x,y,z){ let n=Math.sin(x*127.1+y*311.7+z*74.7)*43758.5453; return n-Math.floor(n); }
+function vnoise(x,y,z){ const xi=Math.floor(x),yi=Math.floor(y),zi=Math.floor(z);
+  const xf=x-xi,yf=y-yi,zf=z-zi,u=sm(xf),v=sm(yf),w=sm(zf); const c=(a,b,cc)=>h(xi+a,yi+b,zi+cc);
+  const x00=c(0,0,0)+u*(c(1,0,0)-c(0,0,0)),x10=c(0,1,0)+u*(c(1,1,0)-c(0,1,0));
+  const x01=c(0,0,1)+u*(c(1,0,1)-c(0,0,1)),x11=c(0,1,1)+u*(c(1,1,1)-c(0,1,1));
+  const y0=x00+v*(x10-x00),y1=x01+v*(x11-x01); return (y0+w*(y1-y0))*2-1; }
+function fbm(x,y,z){ let s=0,a=0.5,f=1; for(let i=0;i<3;i++){ s+=a*vnoise(x*f,y*f,z*f); f*=2; a*=0.5; } return s; }
+function pot(x,y,z,o){ return [fbm(x+o,y,z),fbm(x+31.4,y+12.1+o,z+7.7),fbm(x-8.3,y+5.5,z-19.2+o)]; }
+function curl(x,y,z,o){ const e=0.13,e2=1/(2*e);
+  const a=pot(x,y+e,z,o),b=pot(x,y-e,z,o),cc=pot(x,y,z+e,o),d=pot(x,y,z-e,o),f=pot(x+e,y,z,o),g=pot(x-e,y,z,o);
+  return [((a[2]-b[2])-(cc[1]-d[1]))*e2,((cc[0]-d[0])-(f[2]-g[2]))*e2,((f[1]-g[1])-(a[0]-b[0]))*e2]; }
+
+/* ---------- cometas: posición + historia (cola = puntos decrecientes) ---------- */
+const N=460, TRAIL=22;
+const P=new Float32Array(N*3), bright=new Float32Array(N);
+const hist=new Float32Array(N*TRAIL*3); let head=0;
+for(let i=0;i<N;i++){ const u=Math.random(),v=Math.random(); const th=2*Math.PI*u, ph=Math.acos(2*v-1);
+  const x=Math.sin(ph)*Math.cos(th),y=Math.sin(ph)*Math.sin(th),z=Math.cos(ph);
+  P[i*3]=x;P[i*3+1]=y;P[i*3+2]=z; bright[i]=0.5+0.5*Math.random();
+  for(let k=0;k<TRAIL;k++){ hist[(i*TRAIL+k)*3]=x;hist[(i*TRAIL+k)*3+1]=y;hist[(i*TRAIL+k)*3+2]=z; } }
+const TP=N*TRAIL;
+// buffer de puntos del cometa: pos(3)+size(1)+alpha(1) = 5
+const cometData=new Float32Array(TP*5);
+const sizeFor=new Float32Array(TP), alphaFor=new Float32Array(TP);
+for(let i=0;i<N;i++){ for(let k=0;k<TRAIL;k++){ const id=i*TRAIL+k, f=1-k/TRAIL;
+  sizeFor[id]=(1.4+5.0*bright[i])*f*f+0.5; alphaFor[id]=bright[i]*f*f; } }
+
+const LINK=0.42, CELL=LINK;
+const lineData=new Float32Array(N*5*2*4); let lineVerts=0;
+function rebuildLinks(){ const grid={}, key=(a,b,c)=>a+","+b+","+c;
+  for(let i=0;i<N;i++){ const gx=Math.floor(P[i*3]/CELL),gy=Math.floor(P[i*3+1]/CELL),gz=Math.floor(P[i*3+2]/CELL);
+    (grid[key(gx,gy,gz)] ||= []).push(i); }
+  let w=0; const per=new Int8Array(N);
+  for(let i=0;i<N;i++){ const ix=P[i*3],iy=P[i*3+1],iz=P[i*3+2];
+    const gx=Math.floor(ix/CELL),gy=Math.floor(iy/CELL),gz=Math.floor(iz/CELL);
+    for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++)for(let dz=-1;dz<=1;dz++){
+      const cell=grid[key(gx+dx,gy+dy,gz+dz)]; if(!cell) continue;
+      for(const j of cell){ if(j<=i||per[i]>3||per[j]>3) continue;
+        const a=ix-P[j*3],b=iy-P[j*3+1],c=iz-P[j*3+2], dd=Math.sqrt(a*a+b*b+c*c);
+        if(dd<LINK && w<lineData.length-8){ const s=1-dd/LINK;
+          lineData[w++]=ix;lineData[w++]=iy;lineData[w++]=iz;lineData[w++]=s;
+          lineData[w++]=P[j*3];lineData[w++]=P[j*3+1];lineData[w++]=P[j*3+2];lineData[w++]=s; per[i]++;per[j]++; } }
+    }
+  } lineVerts=w/4;
+}
+
+/* polvo */
+const M=2200; const dustData=new Float32Array(M*5);
+for(let i=0;i<M;i++){ const u=Math.random(),v=Math.random(); const th=2*Math.PI*u, ph=Math.acos(2*v-1);
+  const rr=0.95+Math.random()*0.13;
+  dustData[i*5]=Math.sin(ph)*Math.cos(th)*rr; dustData[i*5+1]=Math.sin(ph)*Math.sin(th)*rr; dustData[i*5+2]=Math.cos(ph)*rr;
+  dustData[i*5+3]=0.8+1.8*Math.random(); dustData[i*5+4]=0.1+0.22*Math.random(); }
+
+/* ---------- GL ---------- */
+function compile(t,s){ const sh=gl.createShader(t); gl.shaderSource(sh,s); gl.compileShader(sh);
+  if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(sh)); return sh; }
+function prog(vs,fs){ const p=gl.createProgram(); gl.attachShader(p,compile(35633,vs)); gl.attachShader(p,compile(35632,fs)); gl.linkProgram(p);
+  if(!gl.getProgramParameter(p,gl.LINK_STATUS)) console.error(gl.getProgramInfoLog(p)); return p; }
+
+const PROJ=`uniform vec2 u_res; uniform mat3 u_rot;
+vec4 project(vec3 dp, out float depth){ vec3 r=u_rot*dp; depth=r.z; vec3 wp=r; wp.z-=3.6;
+  vec2 pr=wp.xy/(-wp.z)*2.1; return vec4(pr.x*(u_res.y/u_res.x), pr.y, 0.0, 1.0); }`;
+
+// puntos (cometas y polvo): pos(3)+size(1)+alpha(1)
+const ptVS=PROJ+`attribute vec3 a_pos; attribute float a_size; attribute float a_a; uniform vec2 u_res; varying float v_a; varying float v_d;
+void main(){ float d; gl_Position=project(a_pos,d); float dep=smoothstep(-1.8,1.4,d);
+  gl_PointSize=a_size*dep*(u_res.y/620.0)+0.6; v_a=a_a*dep; v_d=dep; }`;
+const ptFS=`precision highp float; varying float v_a; varying float v_d;
+void main(){ float d=length(gl_PointCoord-0.5); if(d>0.5) discard;
+  float a=pow(smoothstep(0.5,0.0,d),1.5);
+  vec3 c=mix(vec3(0.5,0.7,1.0), vec3(0.95,0.98,1.0), v_d);
+  gl_FragColor=vec4(c, a*v_a); }`;
+
+const lineVS=PROJ+`attribute vec3 a_pos; attribute float a_s; varying float v_s;
+void main(){ float d; gl_Position=project(a_pos,d); v_s=a_s*smoothstep(-1.8,1.4,d); }`;
+const lineFS=`precision highp float; varying float v_s; void main(){ gl_FragColor=vec4(vec3(0.42,0.62,1.0), v_s*0.3); }`;
+
+const bgVS=`attribute vec2 p; varying vec2 uv; void main(){ uv=p*0.5+0.5; gl_Position=vec4(p,0.0,1.0); }`;
+const bgFS=`precision highp float; varying vec2 uv; uniform vec2 u_res;
+void main(){ vec2 c=uv-0.5; c.x*=u_res.x/u_res.y; float r=length(c);
+  vec3 col=mix(vec3(0.055,0.09,0.18), vec3(0.014,0.02,0.046), smoothstep(0.0,0.72,r));
+  gl_FragColor=vec4(col,1.0); }`;
+
+const ptP=prog(ptVS,ptFS), lineP=prog(lineVS,lineFS), bgP=prog(bgVS,bgFS);
+const cometBuf=gl.createBuffer(), lineBuf=gl.createBuffer();
+const dustBuf=gl.createBuffer(); gl.bindBuffer(34962,dustBuf); gl.bufferData(34962,dustData,35044);
+const quadBuf=gl.createBuffer(); gl.bindBuffer(34962,quadBuf); gl.bufferData(34962,new Float32Array([-1,-1,3,-1,-1,3]),35044);
+
+function attr(p,buf,name,size,stride,off){ gl.bindBuffer(34962,buf);
+  const l=gl.getAttribLocation(p,name); if(l<0) return; gl.enableVertexAttribArray(l); gl.vertexAttribPointer(l,size,5126,false,stride,off); }
+function setProj(p,rot){ gl.uniform2f(gl.getUniformLocation(p,"u_res"),canvas.width,canvas.height);
+  gl.uniformMatrix3fv(gl.getUniformLocation(p,"u_rot"),false,rot); }
+function rotMat(t){ const cy=Math.cos(t*0.08),sy=Math.sin(t*0.08),cx=Math.cos(0.34),sx=Math.sin(0.34);
+  return new Float32Array([ cy,0,-sy, sx*sy,cx,sx*cy, cx*sy,-sx,cx*cy ]); }
+
+let speakUntil=0, speakLvl=0;
+const dpr=Math.min(window.devicePixelRatio||1,2);
+document.getElementById("talk").onclick=()=>{ speakUntil=performance.now()+2800; };
+
+const t0=performance.now();
+function frame(now){
+  const w=Math.floor(innerWidth*dpr), hh=Math.floor(innerHeight*dpr);
+  if(canvas.width!==w||canvas.height!==hh){ canvas.width=w; canvas.height=hh; }
+  const time=(now-t0)/1000, dt=0.016;
+  const speaking=now<speakUntil;
+  speakLvl+=((speaking?1:0)-speakLvl)*0.05;
+  const speak=speakLvl*(0.55+0.35*Math.abs(Math.sin(time*8.0)));
+  const R=0.9+0.03*Math.sin(time*1.0)+0.2*speak;
+  const flow=0.16+0.5*speak;
+
+  for(let i=0;i<N;i++){ const x=P[i*3],y=P[i*3+1],z=P[i*3+2];
+    const c=curl(x*1.25,y*1.25,z*1.25,time*0.05);
+    P[i*3]+=c[0]*flow*dt; P[i*3+1]+=c[1]*flow*dt; P[i*3+2]+=c[2]*flow*dt;
+    const r=Math.hypot(P[i*3],P[i*3+1],P[i*3+2])||1; const f=(R/r-1)*0.08+1;
+    P[i*3]*=f; P[i*3+1]*=f; P[i*3+2]*=f; }
+  head=(head+1)%TRAIL;
+  for(let i=0;i<N;i++){ const hi=(i*TRAIL+head)*3; hist[hi]=P[i*3]; hist[hi+1]=P[i*3+1]; hist[hi+2]=P[i*3+2]; }
+  // construir buffer de puntos cometa (cabeza→cola)
+  for(let i=0;i<N;i++){ for(let k=0;k<TRAIL;k++){ const src=(i*TRAIL+((head-k+TRAIL)%TRAIL))*3, id=i*TRAIL+k, d=id*5;
+    cometData[d]=hist[src]; cometData[d+1]=hist[src+1]; cometData[d+2]=hist[src+2]; cometData[d+3]=sizeFor[id]; cometData[d+4]=alphaFor[id]; } }
+  rebuildLinks();
+
+  const rot=rotMat(time);
+  gl.viewport(0,0,canvas.width,canvas.height);
+  gl.disable(3042); gl.useProgram(bgP); gl.uniform2f(gl.getUniformLocation(bgP,"u_res"),canvas.width,canvas.height);
+  attr(bgP,quadBuf,"p",2,0,0); gl.drawArrays(4,0,3);
+  gl.enable(3042); gl.blendFunc(770,1);
+
+  // polvo
+  gl.useProgram(ptP); setProj(ptP,rot);
+  attr(ptP,dustBuf,"a_pos",3,20,0); attr(ptP,dustBuf,"a_size",1,20,12); attr(ptP,dustBuf,"a_a",1,20,16);
+  gl.drawArrays(0,0,M);
+  // plexus
+  gl.useProgram(lineP); setProj(lineP,rot);
+  gl.bindBuffer(34962,lineBuf); gl.bufferData(34962,lineData.subarray(0,lineVerts*4),35048);
+  attr(lineP,lineBuf,"a_pos",3,16,0); attr(lineP,lineBuf,"a_s",1,16,12); gl.drawArrays(1,0,lineVerts);
+  // cometas (cola de puntos)
+  gl.useProgram(ptP); setProj(ptP,rot);
+  gl.bindBuffer(34962,cometBuf); gl.bufferData(34962,cometData,35048);
+  attr(ptP,cometBuf,"a_pos",3,20,0); attr(ptP,cometBuf,"a_size",1,20,12); attr(ptP,cometBuf,"a_a",1,20,16);
+  gl.drawArrays(0,0,TP);
+
+  stateEl.innerHTML = speaking ? "<b>● HABLANDO</b> — cometas expandidos y entrelazándose" : "○ EN REPOSO — fluyendo";
+  requestAnimationFrame(frame);
+}
+if(gl) requestAnimationFrame(frame);
+</script>
+</body>
+</html>
